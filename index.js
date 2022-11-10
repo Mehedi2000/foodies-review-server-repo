@@ -36,6 +36,13 @@ async function run() {
       res.send(services);
     });
 
+    app.post("/allServices", async (req, res) => {
+      const service = req.body;
+      console.log(service);
+      const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+
     app.get("/allServices/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
