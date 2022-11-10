@@ -42,7 +42,7 @@ async function run() {
       const result = await serviceCollection.insertOne(service);
       res.send(result);
     });
-
+    // service details api
     app.get("/allServices/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
