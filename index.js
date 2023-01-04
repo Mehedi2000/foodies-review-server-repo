@@ -20,6 +20,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const serviceCollection = client.db("foodies").collection("services");
+    const reviewCollection = client.db("foodies").collection("review");
 
     app.get("/services", async (req, res) => {
       const query = {};
@@ -39,6 +40,58 @@ async function run() {
       const service = req.body;
       console.log(service);
       const result = await serviceCollection.insertOne(service);
+      res.send(result);
+    });
+
+    app.get("/currentUserReview", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const reviews = await reviewCollection.find(query).toArray();
+      res.send(reviews);
+    });
+
+    app.get("/review", async (req, res) => {
+      const id = req.query.id;
+      const query = { id: id };
+      const reviews = await reviewCollection.find(query).toArray();
+      res.send(reviews);
+    });
+
+    app.get("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const review = await reviewCollection.findOne(query);
+      res.send(review);
+    });
+
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    });
+
+    app.put("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const review = req.body;
+      const option = { upsert: true };
+      const updateTask = {
+        $set: {
+          text: review.text,
+        },
+      };
+      const result = await reviewCollection.updateOne(
+        filter,
+        updateTask,
+        option
+      );
+      res.send(result);
+    });
+
+    app.delete("/review/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const result = await reviewCollection.deleteOne(filter);
       res.send(result);
     });
     // service details api
